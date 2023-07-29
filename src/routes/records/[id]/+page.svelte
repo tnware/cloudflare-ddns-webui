@@ -3,14 +3,14 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	let record = data.record;
+	let record = data.props.record;
 	let enabled = record.enabled === 1;
 
 	async function toggleStatus() {
 		enabled = !enabled; // Toggle the enabled state
 		const response = await fetch(`/records/${record.id}`, {
 			method: 'POST',
-			body: JSON.stringify({ enabled: enabled ? 1 : 0, id: data.record.id }),
+			body: JSON.stringify({ enabled: enabled ? 1 : 0, id: record.id }),
 			headers: {
 				'content-type': 'application/json'
 			}

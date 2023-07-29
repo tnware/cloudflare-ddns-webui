@@ -20,7 +20,7 @@ import { getRecord } from '$lib/server/api.js';
  *
  */
 export async function load({ params }: { params: { id: string } }) {
-	const record = getRecord(params.id);
+	const record = await getRecord(params.id);
 	if (record) {
 		return { props: { record: record } };
 	}
