@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
-import { getIPAddress } from '$lib/server/api';
+import { getIPAddress, listRecord } from '$lib/server/api';
 
 /**
  * This function loads the data needed by the SvelteKit page on the server-side.
@@ -24,7 +24,8 @@ import { getIPAddress } from '$lib/server/api';
  * </script>
  */
 export const load: PageServerLoad = () => {
+	const records = listRecord({ enabled: 1 });
 	const ipAddress = getIPAddress(1);
 	const enabled_count = db.prepare('SELECT COUNT(*) FROM record WHERE enabled = 1').pluck().get();
-	return { ipAddress, enabled_count };
+	return { ipAddress, enabled_count, records };
 };

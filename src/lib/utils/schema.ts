@@ -22,7 +22,9 @@ CREATE TABLE "Log" (
     "action" TEXT NOT NULL,
     "type" TEXT NOT NULL DEFAULT "INFO",
     "message" TEXT NOT NULL,
-    "timestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "timestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "related_object" TEXT,
+    "related_type" TEXT
 );
 
 CREATE TABLE "IpProviders" (

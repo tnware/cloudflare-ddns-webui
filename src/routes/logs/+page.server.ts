@@ -20,6 +20,6 @@ import { listLog } from '$lib/server/api';
  * </script>
  */
 export const load: PageServerLoad = async () => {
-	let logs = listLog({ type: 'INFO' });
+	let logs = listLog();
 	return { logs };
 };

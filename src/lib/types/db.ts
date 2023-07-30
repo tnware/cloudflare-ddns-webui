@@ -21,6 +21,8 @@ export interface Log {
 	action: string;
 	message: string;
 	timestamp: string;
+	related_object: string;
+	related_type: string;
 }
 
 export interface IpProviders {
@@ -49,4 +51,6 @@ export interface LogFilter {
 	action?: string;
 	message?: string;
 	timestamp?: string;
+	related_object?: string;
+	related_type?: string;
 }

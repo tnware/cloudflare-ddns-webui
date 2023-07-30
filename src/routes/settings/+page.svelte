@@ -77,23 +77,24 @@
 </script>
 
 <P size="4xl" weight="semibold">Public IP Settings</P>
-<div class="p-4 dark:bg-gray-900 rounded">
-	<Table>
-		<TableHead>
-			<TableHeadCell>Property</TableHeadCell>
-			<TableHeadCell>Value</TableHeadCell>
-		</TableHead>
-		<TableBody>
-			<TableBodyRow class="divide-x dark:divide-gray-700">
-				<TableBodyCell><Label for="radio1">IP Address Refreshing</Label></TableBodyCell>
-				<TableBodyCell
-					><Label for="radio2"><Toggle class="ml-4" checked={true}>Enabled</Toggle></Label
-					></TableBodyCell
-				>
-			</TableBodyRow>
-			<TableBodyRow class="divide-x dark:divide-gray-700">
-				<TableBodyCell><Label for="radio1">Interval</Label></TableBodyCell>
-				<TableBodyCell>
+<div class="p-4 rounded">
+	<div class=" bg-white dark:bg-neutral-800 w-full rounded-lg shadow-xl dark:text-white">
+		<div class="p-4 border-b dark:border-neutral-600">
+			<h2 class="text-2xl dark:text-white">Settings</h2>
+			<p class="text-sm text-gray-500">fghfghgf</p>
+		</div>
+		<div>
+			<div
+				class="md:grid md:grid-cols-2 hover:bg-gray-50 dark:hover:bg-neutral-700 md:space-y-0 space-y-1 p-4 border-b dark:border-neutral-600"
+			>
+				<p class="text-neutral-600 dark:text-gray-400">Automatic Updates</p>
+				<p><Label for="radio2"><Toggle class="ml-4" checked={true}>Enabled</Toggle></Label></p>
+			</div>
+			<div
+				class="md:grid md:grid-cols-2 hover:bg-gray-50 dark:hover:bg-neutral-700 md:space-y-0 space-y-1 p-4 border-b dark:border-neutral-600"
+			>
+				<p class="text-neutral-600 dark:text-gray-400">Interval</p>
+				<p>
 					<Label>Select interval</Label>
 					<Select
 						class="mt-2"
@@ -109,13 +110,14 @@
 						bind:value={ipUpdateInterval_setting.value}
 						on:input={updateIpUpdateInterval}
 					/>
-					<!-- {validateCronFormat(ipUpdateInterval_setting.value)} -->
-				</TableBodyCell>
-			</TableBodyRow>
+				</p>
+			</div>
 			{#each ipProviders as ipProvider}
-				<TableBodyRow class="divide-x dark:divide-gray-700">
-					<TableBodyCell>{ipProvider.name}</TableBodyCell>
-					<TableBodyCell>
+				<div
+					class="md:grid md:grid-cols-2 hover:bg-gray-50 dark:hover:bg-neutral-700 md:space-y-0 space-y-1 p-4 border-b dark:border-neutral-600"
+				>
+					<p class="text-neutral-600 dark:text-gray-400">{ipProvider.name}:</p>
+					<p>
 						<Toggle
 							class="ml-4"
 							checked={ipProvider.active === 1}
@@ -123,47 +125,15 @@
 						>
 							{ipProvider.active === 1 ? 'Enabled' : 'Disabled'}
 						</Toggle>
-					</TableBodyCell>
-				</TableBodyRow>
+					</p>
+				</div>
 			{/each}
-		</TableBody>
-	</Table>
-</div>
-
-<P size="4xl" weight="semibold">Cloudflare Settings</P>
-<div class="p-4 dark:bg-gray-900 rounded">
-	<Table>
-		<TableHead>
-			<TableHeadCell>Property</TableHeadCell>
-			<TableHeadCell>Value</TableHeadCell>
-		</TableHead>
-		<TableBody>
-			<TableBodyRow class="divide-x dark:divide-gray-700">
-				<TableBodyCell>Cloudflare E-Mail</TableBodyCell>
-				<TableBodyCell
-					><Input
-						id="cloudflare-email-address"
-						type={'text'}
-						placeholder="E-Mail Address"
-					/></TableBodyCell
-				>
-			</TableBodyRow>
-			<TableBodyRow class="divide-x dark:divide-gray-700">
-				<TableBodyCell>Cloudflare API Key</TableBodyCell>
-				<TableBodyCell>
-					<Input id="cloudflare-api-key" type={'password'} placeholder="API Key" /></TableBodyCell
-				>
-			</TableBodyRow>
-			<TableBodyRow class="divide-x dark:divide-gray-700">
-				<TableBodyCell>Cloudflare Zone ID</TableBodyCell>
-				<TableBodyCell>
-					<Input
-						id="cloudflare-zone-id"
-						type={'text'}
-						bind:value={ipUpdateInterval_setting.value}
-					/>
-				</TableBodyCell>
-			</TableBodyRow>
-		</TableBody>
-	</Table>
+			<div
+				class="md:grid md:grid-cols-2 hover:bg-gray-50 dark:hover:bg-neutral-700 md:space-y-0 space-y-1 p-4 border-b dark:border-neutral-600"
+			>
+				<p class="text-neutral-600 dark:text-gray-400">Debug Logging</p>
+				<p><Toggle class="ml-4" checked={false}>Disabled</Toggle></p>
+			</div>
+		</div>
+	</div>
 </div>

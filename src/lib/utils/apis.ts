@@ -25,7 +25,6 @@ export async function checkRecordsAgainstIP(publicIp: string): Promise<void> {
 	results.forEach((record: Record) => {
 		if (record.content !== publicIp) {
 			console.log('Public IP Changed! object: ' + record.name);
-			createLog('record_updated', record.name + ' => ' + publicIp);
 			updateDnsRecord(record, publicIp);
 			console.log(record);
 		} else {
@@ -131,12 +130,20 @@ export async function updateDnsRecord(record: Record, newIpAddress: Record['cont
 		const response = await axios.put(url, data, { headers });
 		const result = response.data.result;
 		console.log('DNS record updated successfully:', result);
+		createLog('record_updated', record.name + ' => ' + newIpAddress, 'INFO', record.id, 'Record');
 		updateRecordIPAddress(record.id, newIpAddress);
 		return {
 			result: result
 		};
 	} catch (error: any) {
 		console.error('Error updating DNS record:', error.message);
+		createLog(
+			'record_updated',
+			'Error updating record with new IP address ' + newIpAddress + ': ' + error.message,
+			'ERROR',
+			record.id,
+			'Record'
+		);
 		return {
 			error: 'An error occurred while retrieving DNS records.'
 		};
@@ -159,7 +166,7 @@ export async function updateDnsRecord(record: Record, newIpAddress: Record['cont
  */
 export async function getDnsRecords(zone_id: Zones['zone_id']) {
 	const zoneIdentifier = zone_id;
-	const url = `https://api.cloudflare.com/client/v4/zones/${zoneIdentifier}/dns_records`;
+	const url = `https://api.cloudflare.com/client/v4/zones/${zoneIdentifier}/dns_records?type=A`;
 	const headers = {
 		'Content-Type': 'application/json',
 		Authorization: SECRET_CLOUDFLARE_AUTH,

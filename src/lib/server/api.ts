@@ -271,7 +271,49 @@ export async function getRecord(id: string): Promise<Record> {
  */
 export async function upsertRecords(records: Record[]) {
 	try {
-		// the rest of your implementation here
+		for (const record of records) {
+			const existingRecord = db.prepare('SELECT * FROM record WHERE id = ?').get(record.id);
+
+			if (existingRecord) {
+				db.prepare(
+					`
+            UPDATE record
+            SET content = ?,
+                name = ?,
+                type = ?,
+                modified_on = ?,
+                zone_id = ?,
+                zone_name = ?
+            WHERE id = ?
+          `
+				).run(
+					record.content,
+					record.name,
+					record.type,
+					record.modified_on,
+					record.zone_id,
+					record.zone_name,
+					record.id
+				);
+			} else {
+				db.prepare(
+					`
+            INSERT INTO record (id, content, name, type, modified_on, zone_id, zone_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+          `
+				).run(
+					record.id,
+					record.content,
+					record.name,
+					record.type,
+					record.modified_on,
+					record.zone_id,
+					record.zone_name
+				);
+			}
+		}
+
+		console.log('Records upserted successfully');
 	} catch (error) {
 		console.error('Error upserting records: ', error);
 		throw error;
@@ -431,15 +473,17 @@ export async function listRecord(filter?: Partial<Record>): Promise<Record[]> {
 export function createLog(
 	action: Log['action'],
 	message: Log['message'],
-	type: Log['type'] = 'INFO'
+	type: Log['type'] = 'INFO',
+	related_object: Log['related_object'] = '',
+	related_type: Log['related_type'] = ''
 ): RunResult {
 	try {
 		const insertQuery = db.prepare(`
-		INSERT INTO log (action, message, type)
-		VALUES (?, ?, ?)
+		INSERT INTO log (action, message, type, related_object, related_type)
+		VALUES (?, ?, ?, ?, ?)
 	  `);
 
-		const log = insertQuery.run(action, message, type);
+		const log = insertQuery.run(action, message, type, related_object, related_type);
 		return log;
 	} catch (error) {
 		console.error('Error creating log: ', error);
