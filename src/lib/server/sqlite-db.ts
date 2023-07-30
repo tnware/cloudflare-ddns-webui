@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import * as fs from 'fs';
 import { schema } from '../utils/schema';
-const databasePath = './database.db';
+const databasePath = './data/database.db';
 
 // Check if the database file exists
 const databaseExists = fs.existsSync(databasePath);

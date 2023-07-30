@@ -1,7 +1,9 @@
 import { Cron } from 'croner';
-import { createLog } from '$lib/server/api';
+import { createLog } from '$lib/server/sqlite-api';
 import { fetchIPAddress } from '$lib/utils/apis';
-import { getSettings } from '$lib/server/api';
+import { getSettings } from '$lib/server/sqlite-api';
+import type { IPAddress } from '$lib/types/db';
+import { db } from './database';
 
 /**
  * This function initializes the server, creating logs, fetching the IP address, and starting a scheduled task for IP address updates.
@@ -16,7 +18,12 @@ export function serverStart() {
 	// Notify the console and create a log that the server has started
 	console.log('Server started.');
 	createLog('server', 'Server started');
-
+	db<IPAddress>('IPAddress')
+		.where('id', 1)
+		.first()
+		.then((console_id) => {
+			console.log(console_id);
+		});
 	// Fetch IP update interval setting from the database
 	const ipUpdateInterval_setting = getSettings('ip_update_interval');
 

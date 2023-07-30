@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { getDnsRecords } from '$lib/utils/apis.js';
-import { createZone, deleteZones } from '$lib/server/api.js';
+import { createZone, deleteZones } from '$lib/server/sqlite-api.js';
 
 /**
  * This function serves as the POST request handler. It receives a JSON payload,

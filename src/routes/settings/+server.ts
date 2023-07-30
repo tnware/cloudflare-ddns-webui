@@ -1,6 +1,6 @@
-import { db } from '$lib/server/db.js';
+import { db } from '$lib/server/sqlite-db.js';
 import { json } from '@sveltejs/kit';
-import { getIpProviders } from '$lib/server/api.js';
+import { getIpProviders } from '$lib/server/sqlite-api.js';
 
 /**
  * This function serves as the POST request handler. It receives a JSON payload,

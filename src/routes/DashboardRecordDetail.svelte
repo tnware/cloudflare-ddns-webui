@@ -21,8 +21,15 @@
 	}
 
 	afterUpdate(() => {
-		loadLogs();
+		// loadLogs();
 	});
+	// $: selectedRecord = selectedRecord;
+	// loadLogs();
+	$: {
+		if (selectedRecord.id) {
+			loadLogs();
+		}
+	}
 </script>
 
 {#if selectedRecord}
@@ -98,7 +105,12 @@
 					>
 						Date
 					</th>
-
+					<th
+						scope="col"
+						class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
+					>
+						Action
+					</th>
 					<th
 						scope="col"
 						class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
@@ -120,10 +132,17 @@
 						<td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"
 							>{log.timestamp}</td
 						>
+						<td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+							<div>
+								<p class="text-xs font-normal text-gray-600 dark:text-gray-400">
+									{log.action}
+								</p>
+							</div>
+						</td>
 						<td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
 							<!-- Assuming 'log' is the object representing the log in the template -->
 							<!-- Assuming 'log' is the object representing the log in the template -->
-							{#if log.type === 'INFO'}
+							{#if log.result === 'success'}
 								<div
 									class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-emerald-500 bg-emerald-100 dark:bg-emerald-800"
 								>
@@ -142,9 +161,9 @@
 											stroke-linejoin="round"
 										/>
 									</svg>
-									<h2 class="text-sm font-normal">{log.type}</h2>
+									<h2 class="text-sm font-normal">{log.result}</h2>
 								</div>
-							{:else if log.type === 'ERROR'}
+							{:else if log.result === 'error'}
 								<div
 									class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-red-500 bg-red-100 dark:bg-red-800"
 								>
@@ -163,28 +182,7 @@
 											stroke-linejoin="round"
 										/>
 									</svg>
-									<h2 class="text-sm font-normal">{log.type}</h2>
-								</div>
-							{:else if log.type === 'DEBUG'}
-								<div
-									class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-purple-500 bg-purple-100 dark:bg-purple-800"
-								>
-									<svg
-										width="12"
-										height="12"
-										viewBox="0 0 12 12"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M10 3L4.5 8.5L2 6"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										/>
-									</svg>
-									<h2 class="text-sm font-normal">{log.type}</h2>
+									<h2 class="text-sm font-normal">{log.result}</h2>
 								</div>
 							{:else}
 								<!-- Handle any other log types here -->

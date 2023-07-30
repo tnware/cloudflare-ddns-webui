@@ -47,6 +47,7 @@
 		"croner": "^6.0.6",
 		"flowbite": "^1.7.0",
 		"flowbite-svelte": "^0.39.2",
+		"knex": "^2.5.1",
 		"tailwind-merge": "^1.13.2"
 	}
 }

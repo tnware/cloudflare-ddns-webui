@@ -54,3 +54,14 @@ export interface LogFilter {
 	related_object?: string;
 	related_type?: string;
 }
+
+export interface RecordLog {
+	id: number;
+	timestamp: string;
+	action: string;
+	result: string;
+	message: string;
+	old_ip?: string;
+	new_ip?: string;
+	record_id: string;
+}

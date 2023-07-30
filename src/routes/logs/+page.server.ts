@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { listLog } from '$lib/server/api';
+import { listLog } from '$lib/server/sqlite-api';
 
 /**
  * This function loads the data needed by the SvelteKit page on the server-side.

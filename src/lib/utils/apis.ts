@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { createLog, listRecord, upsertIPAddress } from '$lib/server/api';
+import { createLog, listRecord, upsertIPAddress } from '$lib/server/sqlite-api';
 import { SECRET_CLOUDFLARE_AUTH, SECRET_CLOUDFLARE_EMAIL } from '$env/static/private';
-import { db } from '$lib/server/db';
 import type { IPAddress, Record, IpProviders, Zones } from '$lib/types/db';
-import { updateRecordIPAddress, upsertRecords, getActiveIpProviders } from '$lib/server/api';
+import { updateRecordIPAddress, upsertRecords, getActiveIpProviders } from '$lib/server/sqlite-api';
+import { logRecordUpdate, logRecordUpdateError, updateStoredIPAddress } from '$lib/server/api';
 
 /**
  * This async function checks each enabled DNS record against the current public IP.
@@ -130,20 +130,14 @@ export async function updateDnsRecord(record: Record, newIpAddress: Record['cont
 		const response = await axios.put(url, data, { headers });
 		const result = response.data.result;
 		console.log('DNS record updated successfully:', result);
-		createLog('record_updated', record.name + ' => ' + newIpAddress, 'INFO', record.id, 'Record');
+		logRecordUpdate(record.id, record.content, newIpAddress);
 		updateRecordIPAddress(record.id, newIpAddress);
 		return {
 			result: result
 		};
 	} catch (error: any) {
 		console.error('Error updating DNS record:', error.message);
-		createLog(
-			'record_updated',
-			'Error updating record with new IP address ' + newIpAddress + ': ' + error.message,
-			'ERROR',
-			record.id,
-			'Record'
-		);
+		logRecordUpdateError(record.id, record.content, newIpAddress, error.message);
 		return {
 			error: 'An error occurred while retrieving DNS records.'
 		};
@@ -214,7 +208,7 @@ export const fetchIPAddress = async (runCheck: Boolean) => {
 		} else {
 			console.log('Determiend Public IP Address:', result);
 			createLog('public_ip_result', result, 'DEBUG');
-			upsertIPAddress(result, lastUpdated);
+			updateStoredIPAddress(result, lastUpdated);
 			if (runCheck) {
 				checkRecordsAgainstIP(result);
 			}

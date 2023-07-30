@@ -1,6 +1,6 @@
-import { db } from '$lib/server/db';
+import { db } from '$lib/server/sqlite-db';
 import type { PageServerLoad } from './$types';
-import { getIPAddress, listRecord } from '$lib/server/api';
+import { getIPAddress, listRecord } from '$lib/server/sqlite-api';
 
 /**
  * This function loads the data needed by the SvelteKit page on the server-side.
