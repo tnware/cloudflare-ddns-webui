@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { IPAddress } from '$lib/types/db';
 	import { Badge, Button } from 'flowbite-svelte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
+
 	export let ipAddressData: IPAddress;
 	const dispatch = createEventDispatcher();
 
@@ -21,6 +22,24 @@
 			});
 		}
 	}
+	let currentTime = new Date();
+	const intervalId = setInterval(() => {
+		currentTime = new Date();
+	}, 1000);
+
+	onDestroy(() => {
+		clearInterval(intervalId);
+	});
+
+	onDestroy(() => {
+		clearInterval(intervalId);
+	});
+
+	$: {
+		ipAddressData = ipAddressData;
+	}
+	$: timeUntilNextUpdate = new Date(ipAddressData.nextUpdate) - currentTime;
+	$: formattedTimeUntilNextUpdate = new Date(timeUntilNextUpdate).toISOString().substr(11, 8);
 </script>
 
 <!--
@@ -35,11 +54,13 @@
 		<div class="sm:flex sm:items-center sm:justify-between">
 			<div class="text-center sm:text-left">
 				<h1 class="text-2xl font-bold text-white sm:text-3xl">{ipAddressData.ipAddress}</h1>
-				<Badge large color="green">Refresh in 5min</Badge><Badge large color="red"
-					>Auto Refresh Disabled</Badge
+				<Badge large color="green">Updates in {formattedTimeUntilNextUpdate}</Badge><Badge
+					large
+					color="red">Auto Refresh Disabled</Badge
 				>
-
+				<p class="mt-1.5 text-sm text-gray-400">Current Time: {currentTime}</p>
 				<p class="mt-1.5 text-sm text-gray-400">Last Updated: {ipAddressData.lastUpdated}</p>
+				<p class="mt-1.5 text-sm text-gray-400">Next Update: {ipAddressData.nextUpdate}</p>
 			</div>
 
 			<div class="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-center">

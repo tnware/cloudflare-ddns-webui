@@ -2,6 +2,7 @@ export interface IPAddress {
 	id: number;
 	ipAddress: string;
 	lastUpdated: string;
+	nextUpdate: string;
 }
 
 export interface Record {

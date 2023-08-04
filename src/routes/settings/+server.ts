@@ -62,6 +62,21 @@ export async function POST({ request }: { request: Request }) {
 				message: 'IpProvider status updated successfully'
 			}
 		});
+	} else if (payload.action === 'automaticIpRefreshToggle') {
+		const { automaticIpRefresh } = payload;
+		const newValue = automaticIpRefresh ? 'true' : 'false';
+		db.prepare('UPDATE Settings SET value = ? WHERE name = ?').run(
+			newValue,
+			'automatic_ip_refresh'
+		);
+
+		return json({
+			status: 200,
+			body: {
+				success: true,
+				message: 'Automatic IP Refresh status updated successfully'
+			}
+		});
 	} else if (payload.action === 'updateIpRefreshInterval') {
 		const { interval } = payload;
 		db.prepare('UPDATE Settings SET value = ? WHERE name = ?').run(interval, 'ip_update_interval');

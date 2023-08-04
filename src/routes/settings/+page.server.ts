@@ -28,5 +28,6 @@ import { getSettings } from '$lib/server/sqlite-api';
 export const load: PageServerLoad = async () => {
 	const ipProviders: IpProviders[] = db.prepare('SELECT * FROM IpProviders').all() as IpProviders[];
 	const ipUpdateInterval_setting = getSettings('ip_update_interval');
-	return { ipProviders, ipUpdateInterval_setting };
+	const automaticRefresh_setting = getSettings('automatic_ip_refresh');
+	return { ipProviders, ipUpdateInterval_setting, automaticRefresh_setting };
 };

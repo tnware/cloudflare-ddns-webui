@@ -23,6 +23,8 @@
 	export let data: PageData;
 	let ipProviders: IpProviders[] = data.ipProviders;
 	let ipUpdateInterval_setting: Settings = data.ipUpdateInterval_setting;
+	let automaticRefresh_setting: Settings = data.automaticRefresh_setting;
+	let autoRefreshEnabled = automaticRefresh_setting.value === 'true' ? true : false;
 
 	async function updateIpUpdateInterval() {
 		const response = await fetch('/settings', {
@@ -66,6 +68,28 @@
 		}
 	}
 
+	async function toggleAutomaticRefreshStatus(status) {
+		const payload = {
+			automaticIpRefresh: !status,
+			action: 'automaticIpRefreshToggle'
+		};
+
+		const response = await fetch('/settings', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(payload)
+		});
+
+		if (response.ok) {
+			console.log(`Toggle clicked for ${ipProvider.name}. Updated status: ${ipProvider.active}`);
+			invalidateAll();
+		} else {
+			console.error('Failed to update IpProvider status');
+		}
+	}
+
 	function validateCronFormat(value: string) {
 		// Regex pattern for cron job format (e.g., */5 * * * *)
 		const cronPattern = /^(\*(\/\d+)?|\d+(-\d+)?)(\s+(\*(\/\d+)?|\d+(-\d+)?)){4}$/;
@@ -88,7 +112,15 @@
 				class="md:grid md:grid-cols-2 hover:bg-gray-50 dark:hover:bg-neutral-700 md:space-y-0 space-y-1 p-4 border-b dark:border-neutral-600"
 			>
 				<p class="text-neutral-600 dark:text-gray-400">Automatic Updates</p>
-				<p><Label for="radio2"><Toggle class="ml-4" checked={true}>Enabled</Toggle></Label></p>
+				<p>
+					<Label for="radio2"
+						><Toggle
+							class="ml-4"
+							bind:checked={autoRefreshEnabled}
+							on:click={() => toggleAutomaticRefreshStatus(autoRefreshEnabled)}>Enabled</Toggle
+						></Label
+					>
+				</p>
 			</div>
 			<div
 				class="md:grid md:grid-cols-2 hover:bg-gray-50 dark:hover:bg-neutral-700 md:space-y-0 space-y-1 p-4 border-b dark:border-neutral-600"

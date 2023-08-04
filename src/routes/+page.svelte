@@ -1,31 +1,98 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import type RecordItem from './records/RecordItem.svelte';
-	import type { IPAddress } from '$lib/types/db';
-	import { Button } from 'flowbite-svelte';
-	import CurrentIpInfo from './DashboardHeader.svelte';
+	import type { IPAddress, Settings } from '$lib/types/db';
+	import { Badge, Button } from 'flowbite-svelte';
 	import { invalidateAll } from '$app/navigation';
-	import RecordsListMinimal from './records/RecordsListMinimal.svelte';
-	import DashboardHeader from './DashboardHeader.svelte';
-	import RecordItemMinimal from './records/RecordItemMinimal.svelte';
 	import DashboardRecordItem from './DashboardRecordItem.svelte';
 	import DashboardRecordDetail from './DashboardRecordDetail.svelte';
+	import { onDestroy } from 'svelte';
 	let ipAddressData: IPAddress = $page.data.ipAddress;
-	let enabledCount = $page.data.enabled_count;
 	let records = $page.data.records;
+	let automaticRefresh_setting: Settings = $page.data.automaticRefresh_setting;
+	let autoRefreshEnabled = automaticRefresh_setting.value === 'true' ? true : false;
 	let selectedRecord = null;
-	function clickRecord(record) {
-		selectedRecord = record;
-	}
-	function forceUpdateRefresh() {
-		console.log('Reacting to dispatch');
+
+	function refreshData() {
 		invalidateAll();
 		ipAddressData = $page.data.ipAddress;
 	}
+
+	function clickRecord(record) {
+		selectedRecord = record;
+	}
+	async function forceUpdate() {
+		const response = await fetch('/', {
+			method: 'POST',
+			body: JSON.stringify({ text: 'force update' }),
+			headers: {
+				'content-type': 'application/json'
+			}
+		});
+
+		if (response.ok) {
+			console.log(response); // Log the entire response
+			refreshData();
+		}
+	}
+	let currentTime = new Date();
+	const intervalId = setInterval(() => {
+		currentTime = new Date();
+		let timeUntilNextUpdate = new Date(ipAddressData.nextUpdate) - currentTime;
+
+		if (timeUntilNextUpdate <= 0) {
+			refreshData();
+		}
+	}, 1000);
+
+	onDestroy(() => {
+		clearInterval(intervalId);
+	});
+
+	$: timeUntilNextUpdate = new Date(ipAddressData.nextUpdate) - currentTime;
+	$: formattedTimeUntilNextUpdate = new Date(timeUntilNextUpdate).toISOString().substr(11, 8);
 	$: ipAddressData = $page.data.ipAddress;
+	$: records = $page.data.records;
 </script>
 
-<DashboardHeader {ipAddressData} on:message={forceUpdateRefresh} />
+{#if ipAddressData}
+	<div class="p-4">
+		<div class="sm:flex sm:items-center sm:justify-between">
+			<div class="text-center sm:text-left">
+				<h1 class="text-2xl font-bold text-white sm:text-3xl">{ipAddressData.ipAddress}</h1>
+				{#if autoRefreshEnabled}
+					<Badge large color="green">Automatic Refresh {formattedTimeUntilNextUpdate}</Badge>
+				{:else}
+					<Badge large color="red">Automatic Refresh Disabled</Badge>
+				{/if}
+				<p class="mt-1.5 text-sm text-gray-400">Current Time: {currentTime}</p>
+				<p class="mt-1.5 text-sm text-gray-400">Last Updated: {ipAddressData.lastUpdated}</p>
+				<p class="mt-1.5 text-sm text-gray-400">Next Update: {ipAddressData.nextUpdate}</p>
+			</div>
+
+			<div class="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-center">
+				<div class="text-center">
+					<Button color="yellow" on:click={() => forceUpdate()}
+						>Force Update <svg
+							class="w-3.5 h-3.5 ml-2"
+							aria-hidden="true"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 14 10"
+						>
+							<path
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M1 5h12m0 0L9 1m4 4L9 9"
+							/>
+						</svg></Button
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-8">
 	<div class="rounded-lg bg-neutral-800 p-2">

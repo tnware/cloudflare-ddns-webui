@@ -5,6 +5,29 @@ import { getSettings } from '$lib/server/sqlite-api';
 import type { IPAddress } from '$lib/types/db';
 import { db } from './database';
 
+function parseCronInterval(cronString) {
+	const [minuteField] = cronString.split(' ');
+
+	if (minuteField === '*') {
+		return 1;
+	}
+
+	if (minuteField.includes('*/')) {
+		// If the field includes "*/", it means "every x minutes", so return x
+		return Number(minuteField.split('*/')[1]);
+	}
+
+	if (minuteField.includes(',')) {
+		// If the field includes ",", it means specific minutes of the hour are specified
+		const minutes = minuteField.split(',').map(Number);
+		// We assume the minutes are evenly spaced and return the difference between the first two
+		return minutes[1] - minutes[0];
+	}
+
+	// If we don't understand the minute field, return null
+	return null;
+}
+
 /**
  * This function initializes the server, creating logs, fetching the IP address, and starting a scheduled task for IP address updates.
  *
@@ -43,7 +66,17 @@ export function serverStart() {
 
 		// Start the scheduled task using the cron module
 		const job = Cron(ipUpdateInterval, () => {
-			fetchIPAddress(true);
+			const minutesToAdd = parseCronInterval(ipUpdateInterval); // parse the cron string
+			const currentDate = new Date();
+			const nextUpdateDate = new Date(currentDate.getTime() + minutesToAdd * 60000); // Add the interval minutes
+			let nextUpdate = nextUpdateDate.toISOString(); // Set the nextUpdate field
+
+			fetchIPAddress(true).then(() => {
+				// Save the nextUpdate back to the database
+				return db<IPAddress>('IPAddress').where('id', 1).update({
+					nextUpdate: nextUpdate
+				});
+			});
 		});
 
 		// Create a log to confirm the start of the scheduled task

@@ -1,6 +1,6 @@
 import { db } from '$lib/server/sqlite-db';
 import type { PageServerLoad } from './$types';
-import { getIPAddress, listRecord } from '$lib/server/sqlite-api';
+import { getIPAddress, getSettings, listRecord } from '$lib/server/sqlite-api';
 
 /**
  * This function loads the data needed by the SvelteKit page on the server-side.
@@ -27,5 +27,6 @@ export const load: PageServerLoad = () => {
 	const records = listRecord({ enabled: 1 });
 	const ipAddress = getIPAddress(1);
 	const enabled_count = db.prepare('SELECT COUNT(*) FROM record WHERE enabled = 1').pluck().get();
-	return { ipAddress, enabled_count, records };
+	const automaticRefresh_setting = getSettings('automatic_ip_refresh');
+	return { ipAddress, enabled_count, records, automaticRefresh_setting };
 };

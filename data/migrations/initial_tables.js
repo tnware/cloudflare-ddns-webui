@@ -5,6 +5,7 @@ export const up = async (knex) => {
 		table.increments('id').primary();
 		table.string('ipAddress').notNullable();
 		table.timestamp('lastUpdated').notNullable().defaultTo(knex.fn.now());
+		table.timestamp('nextUpdate');
 	});
 
 	await knex.schema.createTable('Record', function (table) {
@@ -61,7 +62,12 @@ export const up = async (knex) => {
 			value: '*/5 * * * *',
 			description: 'Frequency in which the server requests your public IP from IP Providers'
 		},
-		{ name: 'debug', value: 'false', description: 'Enable debug mode for more verbose logging.' }
+		{ name: 'debug', value: 'false', description: 'Enable debug mode for more verbose logging.' },
+		{
+			name: 'automatic_ip_refresh',
+			value: 'true',
+			description: 'Automatically refresh IP at a regular interval. Default is true.'
+		}
 	]);
 
 	await knex.schema.createTable('RecordLog', function (table) {
