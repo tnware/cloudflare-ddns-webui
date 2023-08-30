@@ -39,8 +39,8 @@ export const up = async (knex) => {
 
 	await knex('IpProviders').insert([
 		{ name: 'IPify', url: 'https://api.ipify.org?format=json', active: 1 },
-		{ name: 'IP API', url: 'https://ipapi.co/json/', active: 1 },
-		{ name: 'My-IP', url: 'https://api.my-ip.io/ip.json', active: 1 }
+		{ name: 'IP API', url: 'https://ipapi.co/json/', active: 0 },
+		{ name: 'My-IP', url: 'https://api.my-ip.io/ip.json', active: 0 }
 	]);
 
 	await knex.schema.createTable('Zones', function (table) {
@@ -58,16 +58,16 @@ export const up = async (knex) => {
 
 	await knex('Settings').insert([
 		{
+			name: 'automatic_ip_refresh',
+			value: 'true',
+			description: 'Automatically refresh IP at a regular interval. Default is true.'
+		},
+		{
 			name: 'ip_update_interval',
 			value: '*/5 * * * *',
 			description: 'Frequency in which the server requests your public IP from IP Providers'
 		},
-		{ name: 'debug', value: 'false', description: 'Enable debug mode for more verbose logging.' },
-		{
-			name: 'automatic_ip_refresh',
-			value: 'true',
-			description: 'Automatically refresh IP at a regular interval. Default is true.'
-		}
+		{ name: 'debug', value: 'false', description: 'Enable debug mode for more verbose logging.' }
 	]);
 
 	await knex.schema.createTable('RecordLog', function (table) {

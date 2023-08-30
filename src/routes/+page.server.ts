@@ -1,6 +1,6 @@
-import { db } from '$lib/server/sqlite-db';
-import type { PageServerLoad } from './$types';
-import { getIPAddress, getSettings, listRecord } from '$lib/server/sqlite-api';
+import { db } from "$lib/server/database";
+import type { PageServerLoad } from "./$types";
+import { getIPAddress, getSettings, listRecord } from "$lib/server/api";
 
 /**
  * This function loads the data needed by the SvelteKit page on the server-side.
@@ -23,10 +23,12 @@ import { getIPAddress, getSettings, listRecord } from '$lib/server/sqlite-api';
  *   let enabled_count: number = data.enabled_count;
  * </script>
  */
-export const load: PageServerLoad = () => {
-	const records = listRecord({ enabled: 1 });
-	const ipAddress = getIPAddress(1);
-	const enabled_count = db.prepare('SELECT COUNT(*) FROM record WHERE enabled = 1').pluck().get();
-	const automaticRefresh_setting = getSettings('automatic_ip_refresh');
-	return { ipAddress, enabled_count, records, automaticRefresh_setting };
+export const load: PageServerLoad = async () => {
+  const records = await listRecord({ enabled: 1 });
+  const ipAddress = await getIPAddress(1);
+  const enabled_count = await db("record")
+    .where("enabled", 1)
+    .count("* as count");
+  const automaticRefresh_setting = await getSettings("automatic_ip_refresh");
+  return { ipAddress, enabled_count, records, automaticRefresh_setting };
 };

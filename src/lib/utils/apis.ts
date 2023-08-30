@@ -1,9 +1,16 @@
 import axios from 'axios';
-import { createLog, listRecord, upsertIPAddress } from '$lib/server/sqlite-api';
 import { SECRET_CLOUDFLARE_AUTH, SECRET_CLOUDFLARE_EMAIL } from '$env/static/private';
 import type { IPAddress, Record, IpProviders, Zones } from '$lib/types/db';
-import { updateRecordIPAddress, upsertRecords, getActiveIpProviders } from '$lib/server/sqlite-api';
-import { logRecordUpdate, logRecordUpdateError, updateStoredIPAddress } from '$lib/server/api';
+import {
+	logRecordUpdate,
+	logRecordUpdateError,
+	updateStoredIPAddress,
+	getActiveIpProviders,
+	upsertRecords,
+	updateRecordIPAddress,
+	listRecord,
+	createLog
+} from '$lib/server/api';
 
 /**
  * This async function checks each enabled DNS record against the current public IP.

@@ -1,91 +1,87 @@
-import { db } from '$lib/server/sqlite-db.js';
+import { db } from '$lib/server/database';
 import { json } from '@sveltejs/kit';
-import { getIpProviders } from '$lib/server/sqlite-api.js';
+import { getIpProviders } from '$lib/server/api.js';
 
-/**
- * This function serves as the POST request handler. It receives a JSON payload,
- * determines the requested action from the payload's 'action' field, and
- * then performs one of several operations based on that action.
- *
- * The possible actions are:
- * - 'updateIpProviderStatus': updates the status of an IP provider with the provided ID.
- * - 'updateIpRefreshInterval': updates the refresh interval for IP updates.
- *
- * The JSON payload should have the following format:
- * ```json
- * {
- *   "action": "updateIpProviderStatus" | "updateIpRefreshInterval",
- *   "id": number, // required for 'updateIpProviderStatus' action
- *   "active": boolean, // required for 'updateIpProviderStatus' action
- *   "interval": number  // required for 'updateIpRefreshInterval' action
- * }
- * ```
- *
- * @function POST
- * @param {Object} request - The HTTP request object.
- * @returns {Promise<Object>} The response object to be sent to the client.
- *
- * @example
- * // In the client code
- * fetch("/api/endpoint", {
- *   method: "POST",
- *   body: JSON.stringify({
- *     action: "updateIpProviderStatus",
- *     id: 123,
- *     active: true
- *   })
- * });
- */
+const ACTIONS = {
+	UPDATE_IP_PROVIDER_STATUS: 'updateIpProviderStatus',
+	AUTOMATIC_IP_REFRESH_TOGGLE: 'automaticIpRefreshToggle',
+	MANUAL_IP_REFRESH_TOGGLE: 'manualIpRefreshToggle',
+	UPDATE_IP_REFRESH_INTERVAL: 'updateIpRefreshInterval'
+};
+
 export async function POST({ request }: { request: Request }) {
 	const payload = await request.json();
 
-	if (payload.action === 'updateIpProviderStatus') {
-		const { id, active } = payload;
-		const ipProvider = getIpProviders(id);
-
-		if (!ipProvider) {
+	switch (payload.action) {
+		case ACTIONS.UPDATE_IP_PROVIDER_STATUS:
+			return handleUpdateIpProviderStatus(payload);
+		case ACTIONS.AUTOMATIC_IP_REFRESH_TOGGLE:
+			return handleAutomaticIpRefreshToggle(payload);
+		case ACTIONS.MANUAL_IP_REFRESH_TOGGLE:
+			return handleManualIpRefreshToggle(payload);
+		case ACTIONS.UPDATE_IP_REFRESH_INTERVAL:
+			return handleUpdateIpRefreshInterval(payload);
+		default:
 			return json({
-				status: 404,
+				status: 400,
 				body: {
-					error: 'IpProvider not found'
+					error: 'Invalid action'
 				}
 			});
-		}
-
-		const newStatus = active ? 1 : 0;
-		db.prepare('UPDATE IpProviders SET active = ? WHERE id = ?').run(newStatus, id);
-
-		return json({
-			status: 200,
-			body: {
-				success: true,
-				message: 'IpProvider status updated successfully'
-			}
-		});
-	} else if (payload.action === 'automaticIpRefreshToggle') {
-		const { automaticIpRefresh } = payload;
-		const newValue = automaticIpRefresh ? 'true' : 'false';
-		db.prepare('UPDATE Settings SET value = ? WHERE name = ?').run(
-			newValue,
-			'automatic_ip_refresh'
-		);
-
-		return json({
-			status: 200,
-			body: {
-				success: true,
-				message: 'Automatic IP Refresh status updated successfully'
-			}
-		});
-	} else if (payload.action === 'updateIpRefreshInterval') {
-		const { interval } = payload;
-		db.prepare('UPDATE Settings SET value = ? WHERE name = ?').run(interval, 'ip_update_interval');
-		return json({ success: true, message: 'IP refresh interval updated successfully' });
 	}
+}
+
+async function handleUpdateIpProviderStatus(payload) {
+	const { id, active } = payload;
+	const ipProvider = await getIpProviders(id);
+
+	if (!ipProvider) {
+		return json({
+			status: 404,
+			body: {
+				error: 'IpProvider not found'
+			}
+		});
+	}
+
+	const newStatus = active ? 1 : 0;
+	await db('IpProviders').where('id', id).update({ active: newStatus });
+
 	return json({
-		status: 400,
+		status: 200,
 		body: {
-			error: 'Invalid action'
+			success: true,
+			message: 'IpProvider status updated successfully'
 		}
 	});
+}
+
+async function handleAutomaticIpRefreshToggle(payload) {
+	const { automaticIpRefresh } = payload;
+	const newValue = automaticIpRefresh ? 'true' : 'false';
+	await db('Settings').where('name', 'automatic_ip_refresh').update({ value: newValue });
+
+	return json({
+		status: 200,
+		body: {
+			success: true,
+			message: 'Automatic IP Refresh status updated successfully'
+		}
+	});
+}
+
+async function handleManualIpRefreshToggle(payload) {
+	return json({
+		status: 200,
+		body: {
+			success: true,
+			message: 'Automatic IP Refresh status updated successfully'
+		}
+	});
+}
+
+async function handleUpdateIpRefreshInterval(payload) {
+	const { interval } = payload;
+	await db('Settings').where('name', 'ip_update_interval').update({ value: interval });
+	return json({ success: true, message: 'IP refresh interval updated successfully' });
 }

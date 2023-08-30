@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { getRecord } from '$lib/server/sqlite-api.js';
+import { getRecord } from '$lib/server/api';
 
 /**
  * This function loads a specific record from the server by its ID.

@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { listLog } from '$lib/server/sqlite-api';
+import { listLog } from '$lib/server/api';
 
 /**
  * This function loads logs from the server that have the 'action' set to 'record_updated'.

@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { updateRecordEnabled } from '$lib/server/sqlite-api.js';
+import { updateRecordEnabled } from '$lib/server/api';
 
 /**
  * This function is a SvelteKit server route handler for POST requests to '/records'.

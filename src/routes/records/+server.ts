@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { updateRecordEnabled } from '$lib/server/sqlite-api.js';
+import { updateRecordEnabled } from '$lib/server/api';
 
 /**
  * This asynchronous function handles POST requests. It expects a JSON payload in the request with 'enabled' and 'id' keys.
