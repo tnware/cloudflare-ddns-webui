@@ -14,6 +14,68 @@
 
 🔨 Proudly built with SvelteKit 🛠️
 
+#
+
+I have made some questionable design decisions throughout this project, most of which should be remedied easily, but to be fully tansparent, I have no idea what I'm doing with this project anymore. I was attempting to use sveltekit as both the frontend and the backend, which has proven "possible", but I'm not fully happy with my path and where it's taken me.
+
+If you still feel compelled to run this project, I won't stop you, but here are some things to know:
+
+- after `npm -i`, you should run `npx knex migrate:latest`
+  - the docker container will likely not have a database unless you do this yourself
+
+- i've tried more npm sqlite packages than I care to admit, and I think knex is fine, but by this point I'm completely sick and tired of re-writing the internal API to interact with the sqlite db. This area will not be very pretty.
+
+- the very first load of the frontend *will fail*. the app will crash (due to decisions I made involving the lifecycle of the database, and at which point it's populated versus trying to read the data that should be populated)
+
+  - a second execution of `npm run dev` should work fine.
+
+- you'd need to add a zone on the "zones" page before anything works.
+
+  - make sure to populate a `.env` according to the `.env.example` first
+
+  - once the zone is added, you'd also need to "update records" for that zone
+
+  - then, all the things happen in the "records" page, where you can toggle on/off auto-updating an IP for a record
+
+- further configuration is done in the settings page
+  - most of these properties are functional
+
+- you can also see some logging on the logging page, but there was not enough thought put into the logging process, as to what gets logged, or how it's displayed, or if it would just grow enormously and fill up your server
+
+- above all, feel free to contribute. I'd be happy to collaborate with others on this project; but for my own purposes, i've lost motivation ):
+
+# So
+
+This is basically what the app does... (sometimes I wonder if I should have just written a wrapper for someone else's project.)
+
+```
+Using providers:
+https://api.ipify.org?format=json
+Determiend Public IP Address: 1.2.3.4
+Public IP Hasn't changed for object www.example.com
+```
+
+and
+
+```
+Using providers:
+https://api.ipify.org?format=json
+Determiend Public IP Address: 1.2.3.4
+Public IP Changed! object: www2.example.com
+{
+  id: '68a1def18f8ad126e112228e82fb17f4',
+  content: '4.5.6.7',
+  name: 'www2.example.com',
+  type: 'A',
+  modified_on: '2023-07-16T21:21:01.890672Z',
+  zone_name: 'example.com',
+  zone_id: '2abf9ec05bbca57cd00dd6f5a123ceb4',
+  enabled: 1
+}
+```
+
+But, it has a sveltekit, server-side rendered frontend, and uses local sqlite database  **in attempt** to provide an enhanced user experience (when compared to cli-based or config-file based alternative cloudflare ddns update solutions)
+
 ## Table of Contents
 
 - [Features](#features)
