@@ -14,11 +14,14 @@
 
 🔨 Proudly built with SvelteKit 🛠️
 
-#
+# Update - 5-27-2024
 
 I have made some questionable design decisions throughout this project, most of which should be remedied easily, but to be fully tansparent, I have no idea what I'm doing with this project anymore. I was attempting to use sveltekit as both the frontend and the backend, which has proven "possible", but I'm not fully happy with my path and where it's taken me.
 
 If you still feel compelled to run this project, I won't stop you, but here are some things to know:
+
+- the app doesn't care about IPv6
+  - doesn't care to figure out how to use it, and may break things in trying (same tbh)
 
 - after `npm -i`, you should run `npx knex migrate:latest`
   - the docker container will likely not have a database unless you do this yourself
